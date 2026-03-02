@@ -1,0 +1,43 @@
+{
+  "name": "anonymous-reporting-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure backend for anonymous workplace harassment reporting platform",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "lint": "echo 'Add eslint config if needed'",
+    "seed:pattern-data": "node scripts/reset-and-seed-pattern-data.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@pinecone-database/pinecone": "^7.1.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-validator": "^7.3.0",
+    "helmet": "^8.1.0",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "next-auth": "^4.24.13",
+    "openai": "^6.22.0",
+    "pdf-parse": "^2.4.5",
+    "pinecone": "^0.1.0",
+    "postgres": "^3.4.7",
+    "rate-limiter-flexible": "^8.1.0",
+    "resend": "^6.9.3",
+    "socket.io": "^4.8.3",
+    "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "supertest": "^7.2.2"
+  }
+}
