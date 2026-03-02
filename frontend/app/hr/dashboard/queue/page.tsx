@@ -487,7 +487,7 @@ export default function HrQueuePage() {
         const synced = await updateHrComplaintStatus(
           activeComplaint.complaint_code,
           statusDraft,
-          statusDraft === "rejected" ? rejectionTypeDraft : undefined
+          statusDraft === "rejected" ? (rejectionTypeDraft || undefined) : undefined
         );
         setQueue((prev) =>
           prev.map((item) =>
