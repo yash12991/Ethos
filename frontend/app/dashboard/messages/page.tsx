@@ -434,7 +434,7 @@ export default function MessagesPage() {
   }, [messages]);
 
   const canSend =
-    Boolean(selectedThread) &&
+    selectedThread !== null &&
     !isClosedStatus(selectedThread.complaint_status) &&
     selectedThread.chat_state === "active";
 
