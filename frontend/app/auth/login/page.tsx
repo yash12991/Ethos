@@ -39,7 +39,7 @@ export default function LoginPage() {
     try {
       setAuthError(null);
       const response = await loginAnonUser(values);
-      if (response.data) {
+      if (response.data?.user && response.data?.tokens) {
         login(response.data.user, response.data.tokens);
         router.push("/dashboard");
       }

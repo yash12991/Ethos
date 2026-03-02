@@ -83,7 +83,7 @@ export default function SignupPage() {
         password: values.password,
       });
 
-      if (response.data) {
+      if (response.data?.user && response.data?.tokens) {
         login(response.data.user, response.data.tokens);
         const phrase = await fetchRecoveryPhrase();
         setRecoveryPhrase(phrase);
