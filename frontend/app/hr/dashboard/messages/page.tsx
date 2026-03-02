@@ -487,7 +487,7 @@ export default function HrMessagesPage() {
   }, [messages]);
 
   const canSend =
-    Boolean(selectedThread) &&
+    selectedThread !== null &&
     !isClosedStatus(selectedThread.complaint_status) &&
     selectedThread.chat_state === "active";
 
