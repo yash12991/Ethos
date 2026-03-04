@@ -7,7 +7,12 @@ const logger = require('./utils/logger');
 const { initChatSocket } = require('./socket/chat.socket');
 
 const PORT = Number(process.env.PORT || 5000);
-const clientOrigins = process.env.CLIENT_ORIGIN?.split(',') || ['http://localhost:3000'];
+const defaultClientOrigins = ['http://localhost:3000', 'https://ethos-seven-nu.vercel.app'];
+const configuredClientOrigins = (process.env.CLIENT_ORIGIN || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const clientOrigins = configuredClientOrigins.length ? configuredClientOrigins : defaultClientOrigins;
 
 const server = http.createServer(app);
 

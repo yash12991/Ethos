@@ -410,7 +410,10 @@ type CreateComplaintPayload = {
 };
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  (process.env.NODE_ENV === "production"
+    ? "https://ethos-gool.onrender.com/api/v1"
+    : "http://localhost:5000/api/v1");
 
 function toNetworkErrorMessage(err: unknown) {
   const base = `Unable to reach API at ${API_BASE_URL}. Check backend server, API URL, and CORS origin.`;

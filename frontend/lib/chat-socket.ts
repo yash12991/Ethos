@@ -6,7 +6,10 @@ import { io, type Socket } from "socket.io-client";
 let socket: Socket | null = null;
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  (process.env.NODE_ENV === "production"
+    ? "https://ethos-gool.onrender.com/api/v1"
+    : "http://localhost:5000/api/v1");
 
 function getSocketUrl() {
   return API_BASE_URL.replace(/\/api\/v1$/, "");
