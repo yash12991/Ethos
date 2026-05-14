@@ -17,7 +17,7 @@ const { notFoundMiddleware, errorMiddleware } = require('./middlewares/error.mid
 
 const app = express();
 const apiPrefix = process.env.API_PREFIX || '/api/v1';
-const defaultClientOrigins = ['http://localhost:3000', 'https://ethos-seven-nu.vercel.app'];
+const defaultClientOrigins = ['http://localhost:3000', 'https://ethos-seven-nu.vercel.app','https://ethos-ivory.vercel.app'];
 const configuredClientOrigins = (process.env.CLIENT_ORIGIN || process.env.FRONTEND_URL || '')
   .split(',')
   .map((origin) => origin.trim())
