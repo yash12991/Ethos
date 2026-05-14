@@ -56,17 +56,20 @@ app.use((req, res, next) => {
 });
 
 // Explicitly handle OPTIONS preflight with the same CORS policy and log
-app.options('*', (req, res, next) => {
+// Handle preflight OPTIONS requests without registering a wildcard route
+app.use((req, res, next) => {
+  if (req.method !== 'OPTIONS') return next();
   const origin = req.headers.origin;
   logger.debug('OPTIONS preflight received', { path: req.path, origin });
-  // Delegate to cors middleware to set proper headers
-  cors({
+  // Call the cors middleware for this request to set headers
+  const corsMiddleware = cors({
     origin(originValue, callback) {
       const allowed = !originValue || clientOrigins.includes(originValue);
       return callback(null, allowed);
     },
     credentials: true,
-  })(req, res, next);
+  });
+  return corsMiddleware(req, res, next);
 });
 
 // Log responses that do not include CORS headers when an Origin was present
