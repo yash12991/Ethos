@@ -7,6 +7,7 @@ const mockDataLoader = require('../utils/mockDataLoader');
 const { ApiError } = require('../middlewares/error.middleware');
 const { logAuditEvent } = require('../services/audit.service');
 const { sendHrOtpEmail } = require('../services/email.service');
+const logger = require('../utils/logger');
 
 const hrOtpChallenges = new Map();
 const HR_OTP_TTL_MS = 10 * 60 * 1000;
@@ -66,6 +67,20 @@ function authResponseUser(user) {
     created_at: user.created_at,
     last_login: user.last_login || null,
   };
+}
+
+function buildLocalAliasSuggestions(existingSuggestions, targetCount) {
+  const suggestions = [...existingSuggestions];
+  const seen = new Set(suggestions);
+
+  while (suggestions.length < targetCount) {
+    const alias = generateAnonUsername();
+    if (seen.has(alias)) continue;
+    seen.add(alias);
+    suggestions.push(alias);
+  }
+
+  return suggestions;
 }
 
 async function register(req, res, next) {
@@ -387,8 +402,9 @@ async function getAliasSuggestions(req, res, next) {
     const targetCount = 5;
     let attempts = 0;
     const maxAttempts = 3;
+    let databaseLookupFailed = false;
 
-    while (suggestions.length < targetCount && attempts < maxAttempts) {
+    while (!databaseLookupFailed && suggestions.length < targetCount && attempts < maxAttempts) {
       attempts += 1;
       const needed = targetCount - suggestions.length;
       const batch = await mockDataLoader.fetchExternalAliases(needed + 2);
@@ -396,22 +412,22 @@ async function getAliasSuggestions(req, res, next) {
       for (const alias of batch) {
         if (suggestions.length >= targetCount) break;
 
-        const existing = await userModel.findAnonByAlias(alias);
-        if (!existing && !suggestions.includes(alias)) {
-          suggestions.push(alias);
+        try {
+          const existing = await userModel.findAnonByAlias(alias);
+          if (!existing && !suggestions.includes(alias)) {
+            suggestions.push(alias);
+          }
+        } catch (error) {
+          databaseLookupFailed = true;
+          logger.warn('Alias suggestion duplicate check failed; using local fallback aliases', {
+            error: error.message,
+          });
+          break;
         }
       }
     }
 
-    if (suggestions.length === 0) {
-      suggestions = [
-        generateAnonUsername(),
-        generateAnonUsername(),
-        generateAnonUsername(),
-        generateAnonUsername(),
-        generateAnonUsername(),
-      ];
-    }
+    suggestions = buildLocalAliasSuggestions(suggestions, targetCount);
 
     return res.json({ success: true, aliases: suggestions.slice(0, 5) });
   } catch (err) {

@@ -103,13 +103,17 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/health', (req, res) => {
+const healthResponse = (req, res) => {
   res.json({
     success: true,
     service: 'anonymous-reporting-api',
     timestamp: new Date().toISOString(),
+    path: req.path,
   });
-});
+};
+
+app.get('/health', healthResponse);
+app.get(`${apiPrefix}/health`, healthResponse);
 
 app.use(`${apiPrefix}/auth`, authRoutes);
 app.use(`${apiPrefix}/complaints`, complaintRoutes);

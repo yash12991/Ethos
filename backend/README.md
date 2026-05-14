@@ -55,6 +55,8 @@ backend/
    curl http://localhost:5000/health
    ```
 
+UptimeRobot can monitor either `GET /health` or `GET /api/v1/health` in production. Use the versioned path if you want the monitor URL to match the rest of the API.
+
 ## Environment Variables
 All variables are in `.env.example`. Required values include:
 
