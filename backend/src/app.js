@@ -55,6 +55,39 @@ app.use((req, res, next) => {
   next();
 });
 
+// Explicitly handle OPTIONS preflight with the same CORS policy and log
+app.options('*', (req, res, next) => {
+  const origin = req.headers.origin;
+  logger.debug('OPTIONS preflight received', { path: req.path, origin });
+  // Delegate to cors middleware to set proper headers
+  cors({
+    origin(originValue, callback) {
+      const allowed = !originValue || clientOrigins.includes(originValue);
+      return callback(null, allowed);
+    },
+    credentials: true,
+  })(req, res, next);
+});
+
+// Log responses that do not include CORS headers when an Origin was present
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    const origin = req.headers.origin;
+    if (origin) {
+      const aca = res.getHeader('Access-Control-Allow-Origin');
+      if (!aca) {
+        logger.warn('Response missing CORS header for origin', {
+          origin,
+          method: req.method,
+          path: req.path,
+          statusCode: res.statusCode,
+        });
+      }
+    }
+  });
+  next();
+});
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
