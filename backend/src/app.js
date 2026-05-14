@@ -30,12 +30,30 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
+// CORS: use a callback so we can log decisions and ensure headers are set
 app.use(
   cors({
-    origin: clientOrigins,
+    origin(origin, callback) {
+      // allow requests with no origin (e.g., server-to-server or curl)
+      const allowed = !origin || clientOrigins.includes(origin);
+      logger.debug('CORS origin check', { origin, allowed, clientOrigins });
+      // callback signature: (err, allowed)
+      return callback(null, allowed);
+    },
     credentials: true,
   })
 );
+
+// Safety: ensure Access-Control-Allow-Origin is present for allowed origins
+// even in error paths (helps when other middleware/handlers respond early).
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && clientOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  next();
+});
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
